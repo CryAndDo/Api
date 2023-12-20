@@ -49,10 +49,10 @@ app.MapPost("/login", async(User loginData, ModelDB db) =>
     return Results.Json(response);  
 });
 
-app.MapGet("api/Tariffs", [Authorize] async (ModelDB db) => await db.Tariffs!.ToListAsync());
-app.MapGet("api/Timesheet",  [Authorize] async (ModelDB db) => await db.Timesheets!.ToListAsync());
-app.MapGet("api/Tariffs/{Id:int}", [Authorize] async (ModelDB db, int id) => await db.Tariffs!.Where(u=>u.Id == id).FirstOrDefaultAsync());
-app.MapPost("api/Tariffs", [Authorize] async (Tariffs tarrif, ModelDB db) =>
+app.MapGet("api/Tariffs",  async (ModelDB db) => await db.Tariffs!.ToListAsync());
+app.MapGet("api/Timesheet",   async (ModelDB db) => await db.Timesheets!.ToListAsync());
+app.MapGet("api/Tariffs/{Id:int}", [Authorize] async (ModelDB db, int id) => await db.Tariffs!.Where(u=>u.Speciality_code == id).FirstOrDefaultAsync());
+app.MapPost("api/Tariffs", async (Tariffs tarrif, ModelDB db) =>
 { 
     await db.Tariffs!.AddAsync(tarrif);
     await db.SaveChangesAsync();
@@ -66,7 +66,7 @@ app.MapPost("api/Timesheet", [Authorize] async (Timesheet timesheet, ModelDB db)
 });
 app.MapDelete("api/Tariffs/{Id:int}", [Authorize] async (int id, ModelDB db) =>
 {
-    Tariffs? tarrif = await db.Tariffs.Where(u => u.Id == id).FirstOrDefaultAsync();
+    Tariffs? tarrif = await db.Tariffs.Where(u => u.Speciality_code == id).FirstOrDefaultAsync();
     if (tarrif == null) return Results.NotFound(new { message = "Тариф не найден" });
     db.Tariffs.Remove(tarrif);
     await db.SaveChangesAsync();
@@ -82,11 +82,11 @@ app.MapDelete("api/Timesheet/{Id:int}", [Authorize] async (int Id, ModelDB db) =
 });
 app.MapPut("api/Tariffs", [Authorize] async (Tariffs tarrif, ModelDB db) =>
 {
-    Tariffs? a = await db.Tariffs.Where(u => u.Id == tarrif.Id).FirstOrDefaultAsync();
+    Tariffs? a = await db.Tariffs.Where(u => u.Speciality_code == tarrif.Speciality_code).FirstOrDefaultAsync();
     if (a == null) return Results.NotFound(new { message = "Пользователь не найден" });
-    a.Id = tarrif.Id;
     a.Price = tarrif.Price;  
-    a.Name = tarrif.Name;
+    a.Speciality_name = tarrif.Speciality_name;
+    a.Speciality_code = tarrif.Speciality_code;
     db.Tariffs.Update(a);
     await db.SaveChangesAsync();
     return Results.Json(a);
@@ -97,12 +97,10 @@ app.MapPut("api/Timesheet", [Authorize] async (Timesheet timesheet, ModelDB db) 
     if (s == null) return Results.NotFound(new { message = "Продажа не найдена" });
     s.Id = timesheet.Id;
     s.FIO = timesheet.FIO;
-    s.Name = timesheet.Name;
+    s.Workshop_name = timesheet.Workshop_name;
     s.Speciality = timesheet.Speciality;
     s.Number_of_days_worked = timesheet.Number_of_days_worked;
     s.Zarplata = timesheet.Zarplata;
-    s.Retention = timesheet.Retention;
-    s.Amount_due = timesheet.Amount_due;
     db.Timesheets.Update(s);
     await db.SaveChangesAsync();
     return Results.Json(s);

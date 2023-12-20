@@ -4,21 +4,29 @@ namespace WebApplication1
 {
     public class Timesheet
     {
-        [Key]
         public int Id { get; set; }
         public string? FIO { get; set; }
-        
-        public string? Name { get; set; }
-        [Required]
-        public string Speciality { get; set; }
+        public string? Workshop_name { get; set; }
+        public int Speciality_code {  get; set; }
+        public string? Speciality { get; set; }
         public int Number_of_days_worked { get; set; }
-        [Required]
         public double Zarplata {  get; set; }
-        [Required]
         public double Retention { get; set; }
-        [Required]
         public double Amount_due {  get; set; }
-        public Tariffs? Tariffs { get; set; }
+
+        public Timesheet(int id, string? fIO, string? workshop_name, int speciality_code, string? speciality, int number_of_days_worked, double zarplata)
+        {
+            Id = id;
+            FIO = fIO;
+            Workshop_name = workshop_name;
+            Speciality_code = speciality_code;
+            Speciality = speciality;
+            Number_of_days_worked = number_of_days_worked;
+            Zarplata = zarplata;
+            Retention = RetentionChet();
+            Amount_due = Amount_dueChet();
+        }
+
         public double RetentionChet()
         {
             Retention = Zarplata * 0.13;
